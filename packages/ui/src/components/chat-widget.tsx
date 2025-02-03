@@ -4,24 +4,14 @@ import { Dialog, DialogContent, DialogTrigger } from './ui/dialog'
 import { ChatMessageList } from './chat-message-list'
 import { Input } from './ui/input'
 import { Send } from 'lucide-react'
+import { useChatter } from '../providers/chat-provider'
 
 export interface ChatWidgetProps {
   position?: 'bottom-right' | 'bottom-left'
-  onSendMessage?: (message: string) => void
 }
 
-export function ChatWidget({ position = 'bottom-right', onSendMessage }: ChatWidgetProps) {
-  const [messages, setMessages] = React.useState<Array<{
-    role: 'assistant' | 'user'
-    content: string
-    timestamp: number
-  }>>([
-    {
-      role: 'assistant',
-      content: 'Hello! How can I help you today?',
-      timestamp: Date.now(),
-    },
-  ])
+export function ChatWidget({ position = 'bottom-right' }: ChatWidgetProps) {
+  const { messages, isLoading, sendMessage } = useChatter()
   const [input, setInput] = React.useState('')
 
   const positionClasses = {
@@ -29,18 +19,15 @@ export function ChatWidget({ position = 'bottom-right', onSendMessage }: ChatWid
     'bottom-left': 'bottom-4 left-4',
   }
 
-  const handleSend = () => {
-    if (!input.trim()) return
+  const handleSend = async () => {
+    if (!input.trim() || isLoading) return
 
-    const newMessage = {
-      role: 'user' as const,
-      content: input,
-      timestamp: Date.now(),
+    try {
+      await sendMessage(input)
+      setInput('')
+    } catch (error) {
+      console.error('Failed to send message:', error)
     }
-
-    setMessages((prev) => [...prev, newMessage])
-    setInput('')
-    onSendMessage?.(input)
   }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -60,10 +47,7 @@ export function ChatWidget({ position = 'bottom-right', onSendMessage }: ChatWid
         </DialogTrigger>
         <DialogContent className="h-[600px] w-[400px] p-0 gap-0">
           <div className="flex flex-col h-full">
-            <ChatMessageList
-              messages={messages}
-              className="flex-1"
-            />
+            <ChatMessageList messages={messages} className="flex-1" />
             <div className="p-4 border-t">
               <form
                 onSubmit={(e) => {
@@ -78,9 +62,10 @@ export function ChatWidget({ position = 'bottom-right', onSendMessage }: ChatWid
                   onKeyDown={handleKeyDown}
                   placeholder="Type a message..."
                   className="flex-1"
+                  disabled={isLoading}
                 />
-                <Button type="submit" size="icon">
-                  <Send className="h-4 w-4" />
+                <Button type="submit" size="icon" disabled={isLoading}>
+                  <Send className="h-4 w-4" aria-hidden="true" />
                 </Button>
               </form>
             </div>

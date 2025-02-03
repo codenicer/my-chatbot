@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { MeetingDetails } from '@my-chatbot-core'
+import { MeetingDetails } from '@my-chatbot/core'
 
 interface CalendarState {
   availableSlots: Array<{ start: Date; end: Date }>

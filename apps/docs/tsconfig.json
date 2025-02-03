@@ -1,11 +1,22 @@
 {
-  "extends": "@my-chatbot/typescript-config/nextjs.json",
+  "extends": [
+    "@my-chatbot/typescript-config/react-library.json",
+    "@my-chatbot/typescript-config/nextjs.json",
+  ],
   "compilerOptions": {
     "plugins": [
       {
         "name": "next"
       }
-    ]
+    ],
+    "baseUrl": ".",
+    "paths": {
+      "@my-chatbot/ui/*": ["./src/*"],
+      "react": ["./node_modules/@types/react"],
+      "next": ["./node_modules/@types/next"]
+    },
+  "module": "esnext",
+    "moduleResolution": "node"
   },
   "include": [
     "**/*.ts",
