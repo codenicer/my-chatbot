@@ -18,6 +18,7 @@ export function createRateLimitHandler(config: RateLimitConfig) {
   const WINDOW = config.windowInSeconds || 60 * 60 // 1 hour in seconds
 
   async function POST(request: RateLimitRequest): Promise<ApiResponse> {
+    console.log('HERE!!')
     try {
       const ip = request.headers.get('x-forwarded-for') || 'unknown'
       const key = `rate_limit:${ip}`
@@ -62,4 +63,37 @@ export function createRateLimitHandler(config: RateLimitConfig) {
   }
 
   return { GET, POST }
+}
+
+export interface RateLimitParams {
+  identifier: string // Usually IP address or user ID
+  limit: number // Max requests per window
+  window: number // Time window in seconds
+  redis: Redis // Redis client instance
+}
+
+export async function checkRateLimit({
+  identifier,
+  limit = 20, // 20 messages default
+  window = 3600, // 1 hour in seconds
+  redis,
+}: RateLimitParams) {
+  console.log('HERE!!,checkRateLimit')
+  const key = `rate-limit:${identifier}`
+
+  const [count] = await redis.pipeline().incr(key).expire(key, window).exec()
+
+  const remaining = limit - (count as number)
+  const reset = Math.floor(Date.now() / 1000) + window
+
+  console.log('remaining', remaining)
+  if (remaining < 0) {
+    throw new Error('Rate limit exceeded')
+  }
+
+  return {
+    limit,
+    remaining: Math.max(0, remaining),
+    reset,
+  }
 }

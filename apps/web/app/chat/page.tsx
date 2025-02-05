@@ -1,9 +1,18 @@
 'use client'
 
-import { PersonalContext, CalendarService } from '@my-chatbot/core'
+import { PersonalContext, CalendarService, RateLimitParams } from '@my-chatbot/core'
 import { RootProvider, ChatWidget } from '@my-chatbot/ui'
+import { Redis } from '@upstash/redis'
+import { useEffect, useState } from 'react'
+
+// Initialize Redis with public env vars
+const redis = new Redis({
+  url: process.env.NEXT_PUBLIC_REDIS_URL!,
+  token: process.env.NEXT_PUBLIC_REDIS_TOKEN!,
+})
 
 export default function ChatPage() {
+  const [clientIp, setClientIp] = useState<string>('unknown')
   const calendarService = new CalendarService()
   const personalContext: PersonalContext = {
    assistant: {
@@ -39,23 +48,41 @@ export default function ChatPage() {
    },
  };
 
+  useEffect(() => {
+    // Fetch client IP on component mount
+    fetch('/api/client-ip')
+      .then(res => res.json())
+      .then(data => setClientIp(data.ip))
+      .catch(console.error)
+  }, [])
 
-  if (!process.env.NEXT_PUBLIC_OPENAI_API_KEY) {
+  // Configure rate limit with client IP
+  const rateLimit: RateLimitParams = {
+    identifier: `chat:${clientIp}`,  // Use IP in identifier
+    limit: 5,
+    window: 3600,
+    redis,
+  }
+
+  console.log('rateLimit', rateLimit)
+
+  if (!process.env.NEXT_PUBLIC_OPENAI_API_KEY || !process.env.NEXT_PUBLIC_REDIS_URL || !process.env.NEXT_PUBLIC_REDIS_TOKEN) {
     return (
       <div className="p-4">
         <h1 className="text-2xl font-bold text-red-500">Error</h1>
-        <p>API keys are not configured</p>
+        <p>Required environment variables are not configured</p>
       </div>
     )
   }
 
   return (
     <RootProvider
-      key="chat-provider"
+      key={`chat-provider-${clientIp}`} // Force re-render when IP changes
       personalContext={personalContext}
-      apiKey={process.env.NEXT_PUBLIC_OPENAI_API_KEY!}
+      apiKey={process.env.NEXT_PUBLIC_OPENAI_API_KEY}
       calendarService={calendarService}
       model="gpt-4o-mini"
+      rateLimit={rateLimit}
     >
       <main className="min-h-screen p-4 bg-white dark:bg-gray-900">
         <h1 className="text-2xl font-bold mb-8 text-gray-900 dark:text-white">

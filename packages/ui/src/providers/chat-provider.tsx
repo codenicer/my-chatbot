@@ -1,9 +1,9 @@
 'use client'
 
 import * as React from 'react'
-import { AIService, PersonalContext, ChatMessage, AIModel, EmailService } from '@my-chatbot/core'
+import { AIService, PersonalContext, ChatMessage, AIModel, EmailService, RateLimitParams } from '@my-chatbot/core'
 import { useChat } from '../hooks/use-chat'
-import { EmailSendingIndicator } from '../components/email-sending-indicator'
+import { checkRateLimit } from '@my-chatbot/core'
 
 interface ChatContextValue {
   sendMessage: (content: string) => Promise<void>
@@ -19,17 +19,19 @@ interface ChatProviderProps {
   personalContext: PersonalContext
   apiKey: string
   model?: AIModel
+  rateLimit: RateLimitParams
 }
 
 export function ChatProvider({ 
   children, 
   personalContext, 
   apiKey,
-  model = 'gpt-4o-mini'
+  model = 'gpt-4o-mini',
+  rateLimit
 }: ChatProviderProps) {
   const aiService = React.useMemo(() => new AIService(apiKey, model), [apiKey, model])
   const emailService = React.useMemo(() => new EmailService(), [])
-  const { messages, isLoading, sendMessage, setMessages, setIsLoading } = useChat()
+  const { messages, isLoading, setMessages, setIsLoading } = useChat()
 
   const handleMessage = React.useCallback(async (message: string) => {
     const sendResumeMatch = message.match(/SEND_RESUME:([^\s]+)/)
@@ -70,7 +72,34 @@ export function ChatProvider({
   const handleSendMessage = React.useCallback(
     async (content: string) => {
       try {
-        setIsLoading(true)  // Set loading at the start
+        setIsLoading(true)
+
+        // Check rate limit before processing message
+        try {
+          console.log('HERE!!,checkRateLimit',
+           {
+            identifier: 'chat', // You might want to use user ID or IP here
+            limit: rateLimit.limit,
+            window: rateLimit.window ,
+            redis: rateLimit.redis
+          }
+          )
+          await checkRateLimit({
+            identifier: 'chat', // You might want to use user ID or IP here
+            limit: rateLimit.limit,
+            window: rateLimit.window ,
+            redis: rateLimit.redis
+          })
+        } catch (error) {
+          console.log('error', error)
+          setMessages(prev => [...prev, {
+            id: Date.now().toString(),
+            role: 'assistant',
+            content: `⚠️ Message limit reached (${rateLimit.limit} messages per hour). Please try again later.`,
+            timestamp: Date.now(),
+          }])
+          return
+        }
         
         // Add user message
         setMessages(prev => [...prev, {
@@ -93,7 +122,7 @@ export function ChatProvider({
         setIsLoading(false)  // Clear loading state when done
       }
     },
-    [aiService, personalContext, handleMessage, setMessages, setIsLoading]
+    [aiService, personalContext, handleMessage, setMessages, setIsLoading, rateLimit]
   )
 
   const value = React.useMemo(
