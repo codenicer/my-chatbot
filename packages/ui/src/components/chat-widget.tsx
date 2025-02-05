@@ -53,17 +53,17 @@ export function ChatWidget({ position = 'bottom-right' }: ChatWidgetProps) {
           </Button>
         </DialogTrigger>
         <DialogContent 
-          className="h-[600px] w-[400px] p-0 gap-0 bg-white dark:bg-gray-800 rounded-lg shadow-xl"
+          className="h-[600px] w-[400px] p-0 gap-0 bg-white dark:bg-gray-800 rounded-lg shadow-xl overflow-hidden"
           style={{ 
             position: 'fixed',
             bottom: position.startsWith('bottom') ? '5rem' : 'auto',
             right: position.endsWith('right') ? '1rem' : 'auto',
             left: position.endsWith('left') ? '1rem' : 'auto',
-            transform: 'none' // Override the default transform
+            transform: 'none'
           }}
         >
           <div className="flex flex-col h-full">
-            <div className="p-4 border-b dark:border-gray-700 bg-gray-50 dark:bg-gray-900 rounded-t-lg">
+            <div className="shrink-0 p-4 border-b dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
               <DialogTitle className="text-lg font-semibold text-gray-900 dark:text-white">
                 Chat with AI Assistant
               </DialogTitle>
@@ -71,8 +71,12 @@ export function ChatWidget({ position = 'bottom-right' }: ChatWidgetProps) {
                 Ask me anything about your professional profile and career.
               </DialogDescription>
             </div>
-            <ChatMessageList messages={messages} className="flex-1 overflow-y-auto px-4" />
-            <div className="p-4 border-t dark:border-gray-700 bg-gray-50 dark:bg-gray-900 rounded-b-lg">
+            
+            <div className="flex-1 overflow-y-auto p-4">
+              <ChatMessageList messages={messages} />
+            </div>
+
+            <div className="shrink-0 p-4 border-t dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
               <form
                 onSubmit={(e) => {
                   e.preventDefault()
@@ -85,10 +89,15 @@ export function ChatWidget({ position = 'bottom-right' }: ChatWidgetProps) {
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={handleKeyDown}
                   placeholder="Type a message..."
-                  className="flex-1"
+                  className="flex-1 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                   disabled={isLoading}
                 />
-                <Button type="submit" size="icon" disabled={isLoading}>
+                <Button 
+                  type="submit" 
+                  size="icon" 
+                  disabled={isLoading}
+                  className="bg-blue-500 hover:bg-blue-600 text-white"
+                >
                   <Send className="h-4 w-4" aria-hidden="true" />
                 </Button>
               </form>

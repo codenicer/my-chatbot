@@ -3,14 +3,22 @@
 import OpenAI from 'openai'
 import { PersonalContext, ChatMessage } from '../types'
 
+export type AIModel =
+  | 'gpt-4'
+  | 'gpt-3.5-turbo'
+  | 'gpt-4-turbo-preview'
+  | 'gpt-4o-mini'
+
 export class AIService {
   private openai: OpenAI
+  private model: AIModel
 
-  constructor(apiKey: string) {
+  constructor(apiKey: string, model: AIModel = 'gpt-4o-mini') {
     this.openai = new OpenAI({
       apiKey,
       dangerouslyAllowBrowser: true, // Enable client-side usage
     })
+    this.model = model
   }
 
   async getResponse(
@@ -26,7 +34,7 @@ export class AIService {
           },
           { role: 'user', content: message },
         ],
-        model: 'gpt-3.5-turbo',
+        model: this.model,
       })
 
       return {

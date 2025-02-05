@@ -49,6 +49,7 @@ export default function ChatPage() {
       personalContext={personalContext}
       apiKey={process.env.NEXT_PUBLIC_OPENAI_API_KEY!}
       calendarService={calendarService}
+      model="gpt-4o-mini"
     >
       <main className="min-h-screen p-4 bg-white dark:bg-gray-900">
         <h1 className="text-2xl font-bold mb-8 text-gray-900 dark:text-white">

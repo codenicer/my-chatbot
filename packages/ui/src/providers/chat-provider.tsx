@@ -1,7 +1,7 @@
 'use client'
 
 import * as React from 'react'
-import { AIService, PersonalContext, ChatMessage } from '@my-chatbot/core'
+import { AIService, PersonalContext, ChatMessage, AIModel } from '@my-chatbot/core'
 import { useChat } from '../hooks/use-chat'
 
 interface ChatContextValue {
@@ -16,10 +16,16 @@ interface ChatProviderProps {
   children: React.ReactNode
   personalContext: PersonalContext
   apiKey: string
+  model?: AIModel
 }
 
-export function ChatProvider({ children, personalContext, apiKey }: ChatProviderProps) {
-  const aiService = React.useMemo(() => new AIService(apiKey), [apiKey])
+export function ChatProvider({ 
+  children, 
+  personalContext, 
+  apiKey,
+  model = 'gpt-4o-mini'
+}: ChatProviderProps) {
+  const aiService = React.useMemo(() => new AIService(apiKey, model), [apiKey, model])
   const { messages, isLoading, sendMessage } = useChat()
 
   const handleSendMessage = React.useCallback(
