@@ -1,67 +1,58 @@
-import { ApiResponse, createResponse } from './utils'
-import type { PersonalContext } from '../types'
+import type { Transporter } from 'nodemailer'
+import { PersonalContext } from '../types'
 
-export interface EmailConfig {
+export interface SendResumeEmailParams {
+  toEmail: string
+  subject: string
+  context: PersonalContext
+  transporter: Transporter
   from: string
-  transport: {
-    sendMail(options: {
-      from: string
-      to: string
-      subject: string
-      text: string
-      attachments: Array<{ filename: string; content: string }>
-    }): Promise<any>
-  }
 }
 
-export interface EmailRequest {
-  json(): Promise<{
-    toEmail: string
-    context: PersonalContext
-  }>
-}
+export async function sendResumeEmail(params: SendResumeEmailParams) {
+  try {
+    const { toEmail, subject, context, transporter, from } = params
 
-export function createEmailHandler(config: EmailConfig) {
-  function generateCSV(context: PersonalContext): string {
-    const rows = [
-      ['Name', `${context.information.name} ${context.information.lastName}`],
-      ['Current Role', context.professional.currentRole],
-      ['Company', context.professional.company],
-      ['Experience', `${context.professional.experience} years`],
-      [
-        'Skills',
-        context.professional.skills
-          .map((s) => `${s.name} (${s.experience} years)`)
-          .join(', '),
-      ],
-    ]
-    return rows.map((row) => row.join(',')).join('\n')
-  }
-
-  async function POST(request: EmailRequest): Promise<ApiResponse> {
-    try {
-      const { toEmail, context } = await request.json()
-      const csvContent = generateCSV(context)
-
-      await config.transport.sendMail({
-        from: config.from,
-        to: toEmail,
-        subject: `Professional Profile - ${context.information.name}`,
-        text: 'Please find attached the professional profile.',
-        attachments: [
-          {
-            filename: 'profile.csv',
-            content: csvContent,
-          },
-        ],
-      })
-
-      return createResponse({ success: true })
-    } catch (error) {
-      console.error('Email API error:', error)
-      return createResponse({ error: 'Failed to send email' }, 500)
+    // Download the resume PDF
+    const resumeResponse = await fetch(context.information.resumeUrl)
+    if (!resumeResponse.ok) {
+      throw new Error('Failed to download resume')
     }
-  }
+    const resumeBuffer = await resumeResponse.arrayBuffer()
 
-  return { POST }
+    // Create email content
+    const htmlContent = `
+      <h2>Hello,</h2>
+      <p>Thank you for your interest in ${context.information.name}'s profile.</p>
+      <p>Please find attached their resume for the ${context.professional.currentRole} position.</p>
+      <br/>
+      <p><strong>Current Role:</strong> ${context.professional.currentRole} at ${context.professional.company}</p>
+      <p><strong>Experience:</strong> ${context.professional.experience} years</p>
+      <p><strong>Key Skills:</strong> ${context.professional.skills.map((s) => s.name).join(', ')}</p>
+      <br/>
+      <p>Best regards,</p>
+      <p>${context.assistant.name}</p>
+      <p>${context.information.name}'s AI Assistant</p>
+    `
+
+    // Send email with attachment
+    await transporter.sendMail({
+      from,
+      to: toEmail,
+      subject,
+      html: htmlContent,
+      attachments: [
+        {
+          filename: `${context.information.name.toLowerCase()}_resume.pdf`,
+          content: Buffer.from(resumeBuffer),
+          contentType: 'application/pdf',
+        },
+      ],
+    })
+
+    return { success: true }
+  } catch (error) {
+    console.error('Email send error:', error)
+    throw error
+  }
 }

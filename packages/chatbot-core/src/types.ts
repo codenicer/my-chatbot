@@ -23,7 +23,7 @@ export type PersonalContext = {
       country: string
       openToRelocation?: boolean
     }
-    resumeUrl?: string
+    resumeUrl: string
   }
   preferences: {
     minSalary: number

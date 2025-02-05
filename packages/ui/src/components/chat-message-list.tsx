@@ -8,9 +8,14 @@ export interface ChatMessageListProps {
     content: string
   }>
   className?: string
+  isLoading?: boolean
+  assistantName?: string
 }
 
-export function ChatMessageList({ messages, className }: ChatMessageListProps) {
+export function ChatMessageList({ 
+  messages, 
+  className,
+}: ChatMessageListProps) {
   const messagesEndRef = React.useRef<HTMLDivElement>(null)
 
   const scrollToBottom = () => {
@@ -45,6 +50,7 @@ export function ChatMessageList({ messages, className }: ChatMessageListProps) {
           </div>
         </div>
       ))}
+     
       <div ref={messagesEndRef} />
     </div>
   )

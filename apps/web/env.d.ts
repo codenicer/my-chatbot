@@ -7,5 +7,11 @@ declare namespace NodeJS {
     GOOGLE_PRIVATE_KEY: string
     EMAIL_USER: string
     EMAIL_PASSWORD: string
+    SMTP_HOST: string
+    SMTP_PORT: string
+    SMTP_USER: string
+    SMTP_PASS: string
+    SMTP_FROM: string
+    NODE_ENV: 'development' | 'production' | 'test'
   }
 }
