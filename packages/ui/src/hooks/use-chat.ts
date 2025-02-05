@@ -1,13 +1,15 @@
+'use client'
+
 import { useState, useCallback } from 'react'
 import { useChatStore } from '../store/chat-store'
-import { AIService, ChatMessage } from '@my-chatbot/core'
+import { AIService, ChatMessage, PersonalContext } from '@my-chatbot/core'
 
 export function useChat() {
   const [isLoading, setIsLoading] = useState(false)
   const { messages, addMessage, setError } = useChatStore()
 
   const sendMessage = useCallback(
-    async (content: string, aiService: AIService) => {
+    async (content: string, aiService: AIService, context: PersonalContext) => {
       try {
         setIsLoading(true)
 
@@ -21,9 +23,10 @@ export function useChat() {
         addMessage(userMessage)
 
         // Get AI response
-        const response = await aiService.getResponse(content)
+        const response = await aiService.getResponse(content, context)
         addMessage(response)
       } catch (error) {
+        console.error('Chat error:', error)
         setError(
           error instanceof Error ? error.message : 'Failed to send message'
         )

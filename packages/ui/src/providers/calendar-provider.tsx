@@ -1,3 +1,5 @@
+'use client'
+
 import * as React from 'react'
 import { CalendarService, MeetingDetails } from '@my-chatbot/core'
 import { useCalendar } from '../hooks/use-calendar'

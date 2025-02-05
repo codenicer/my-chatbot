@@ -1,5 +1,15 @@
 {
   "$schema": "https://turbo.build/schema.json",
+  "globalDependencies": ["**/.env.*local"],
+  "globalEnv": [
+    "NEXT_PUBLIC_OPENAI_API_KEY",
+    "REDIS_URL",
+    "REDIS_TOKEN",
+    "GOOGLE_SERVICE_ACCOUNT_EMAIL",
+    "GOOGLE_PRIVATE_KEY",
+    "EMAIL_USER",
+    "EMAIL_PASSWORD"
+  ],
   "ui": "tui",
   "tasks": {
     "build": {

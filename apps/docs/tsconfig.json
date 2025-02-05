@@ -15,7 +15,7 @@
       "react": ["./node_modules/@types/react"],
       "next": ["./node_modules/@types/next"]
     },
-  "module": "esnext",
+    "module": "esnext",
     "moduleResolution": "node"
   },
   "include": [

@@ -1,3 +1,5 @@
+'use client'
+
 import * as React from 'react'
 import { AIService, PersonalContext, ChatMessage } from '@my-chatbot/core'
 import { useChat } from '../hooks/use-chat'
@@ -17,18 +19,14 @@ interface ChatProviderProps {
 }
 
 export function ChatProvider({ children, personalContext, apiKey }: ChatProviderProps) {
-  const aiService = React.useMemo(
-    () => new AIService(apiKey, personalContext),
-    [apiKey, personalContext]
-  )
-
+  const aiService = React.useMemo(() => new AIService(apiKey), [apiKey])
   const { messages, isLoading, sendMessage } = useChat()
 
   const handleSendMessage = React.useCallback(
     async (content: string) => {
-      await sendMessage(content, aiService)
+      await sendMessage(content, aiService, personalContext)
     },
-    [sendMessage, aiService]
+    [sendMessage, aiService, personalContext]
   )
 
   const value = React.useMemo(
