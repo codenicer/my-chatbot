@@ -1,19 +1,15 @@
 import { google } from 'googleapis'
 import { createCalendarHandler } from '@my-chatbot/core'
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 
-const calendar = google.calendar({
-  version: 'v3',
-  auth: new google.auth.JWT({
-    email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-    key: process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-    scopes: ['https://www.googleapis.com/auth/calendar'],
-  }),
+const handler = createCalendarHandler({
+  serviceAccountEmail: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL!,
+  privateKey: process.env.GOOGLE_PRIVATE_KEY!,
+  google: google,
 })
 
-const handler = createCalendarHandler({ calendar })
-
-export async function POST(request: NextRequest) {
-  const result = await handler.POST(request)
+export async function POST(request: Request) {
+  const body = await request.json()
+  const result = await handler.POST({ body })
   return NextResponse.json(result.json, { status: result.status })
 }

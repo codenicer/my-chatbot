@@ -1,6 +1,7 @@
 export type PersonalContext = {
   assistant: {
     name: string
+    avatarUrl?: string
   }
   professional: {
     currentRole: string
@@ -44,4 +45,23 @@ export type ChatError = {
   code: string
   message: string
   timestamp: number
+}
+
+export interface MeetingDetails {
+  purpose: string
+  datetime: string
+  duration: number
+  attendees: string[]
+  description?: string
+  location?: string
+}
+
+export interface CalendarEvent {
+  id?: string
+  summary?: string
+  description?: string
+  start?: { dateTime?: string }
+  end?: { dateTime?: string }
+  attendees?: { email: string }[]
+  hangoutLink?: string
 }

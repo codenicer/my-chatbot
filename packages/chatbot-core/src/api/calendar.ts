@@ -1,173 +1,71 @@
+import { GoogleApis } from 'googleapis'
 import { ApiResponse, createResponse } from './utils'
-import type { calendar_v3 } from 'googleapis'
 
 export interface CalendarConfig {
-  calendar: calendar_v3.Calendar
+  serviceAccountEmail: string
+  privateKey: string
+  google: GoogleApis
 }
 
 export interface CalendarRequest {
-  json(): Promise<{
-    action: 'create' | 'check' | 'suggest'
-    startTime: string
-    endTime?: string
-    duration?: number
-    summary?: string
-    description?: string
-    attendees?: string[]
-    preferredDates?: string[]
-    preferredTimeRanges?: Array<{ start: string; end: string }>
-  }>
+  body: {
+    details: {
+      purpose: string
+      datetime: string
+      duration: number
+      attendees: string[]
+      description?: string
+    }
+  }
 }
 
 export function createCalendarHandler(config: CalendarConfig) {
-  async function findFreeSlots(
-    start: Date,
-    end: Date,
-    busy: Array<{ start: string; end: string }>,
-    duration: number
-  ) {
-    const slots: Array<{ start: string; end: string }> = []
-    let current = new Date(start)
+  const auth = new config.google.auth.JWT({
+    email: config.serviceAccountEmail,
+    key: config.privateKey,
+    scopes: ['https://www.googleapis.com/auth/calendar'],
+  })
 
-    busy.forEach((busySlot) => {
-      const busyStart = new Date(busySlot.start)
-      const busyEnd = new Date(busySlot.end)
-
-      while (current < busyStart) {
-        const slotEnd = new Date(current.getTime() + duration * 60000)
-        if (slotEnd <= busyStart) {
-          slots.push({
-            start: current.toISOString(),
-            end: slotEnd.toISOString(),
-          })
-        }
-        current = new Date(current.getTime() + duration * 60000)
-      }
-      current = new Date(busyEnd)
-    })
-
-    while (current < end) {
-      const slotEnd = new Date(current.getTime() + duration * 60000)
-      if (slotEnd <= end) {
-        slots.push({
-          start: current.toISOString(),
-          end: slotEnd.toISOString(),
-        })
-      }
-      current = new Date(current.getTime() + duration * 60000)
-    }
-
-    return slots
-  }
+  const calendar = config.google.calendar({ version: 'v3', auth })
 
   async function POST(request: CalendarRequest): Promise<ApiResponse> {
     try {
-      const data = await request.json()
+      const { details } = request.body
 
-      switch (data.action) {
-        case 'check': {
-          const endTime = new Date(
-            new Date(data.startTime).getTime() + (data.duration || 30) * 60000
-          )
+      const startTime = new Date(details.datetime)
+      const endTime = new Date(startTime.getTime() + details.duration * 60000)
 
-          const response = await config.calendar.freebusy.query({
-            requestBody: {
-              timeMin: data.startTime,
-              timeMax: endTime.toISOString(),
-              items: [{ id: 'primary' }],
-            },
-          })
-
-          const busy = response.data.calendars?.primary?.busy || []
-          return createResponse({ available: busy.length === 0 })
-        }
-
-        case 'suggest': {
-          if (
-            !data.preferredDates ||
-            !data.preferredTimeRanges ||
-            !data.duration
-          ) {
-            return createResponse(
-              { error: 'Missing required fields for slot suggestion' },
-              400
-            )
-          }
-
-          const availableSlots: Array<{ start: string; end: string }> = []
-
-          for (const date of data.preferredDates) {
-            for (const range of data.preferredTimeRanges) {
-              const [startH, startM] = range.start.split(':').map(Number)
-              const [endH, endM] = range.end.split(':').map(Number)
-
-              const startTime = new Date(date)
-              startTime.setHours(startH, startM, 0, 0)
-              const endTime = new Date(date)
-              endTime.setHours(endH, endM, 0, 0)
-
-              const response = await config.calendar.freebusy.query({
-                requestBody: {
-                  timeMin: startTime.toISOString(),
-                  timeMax: endTime.toISOString(),
-                  items: [{ id: 'primary' }],
-                },
-              })
-
-              const busy = response.data.calendars?.primary?.busy || []
-              const slots = await findFreeSlots(
-                startTime,
-                endTime,
-                busy.map((b) => ({ start: b.start!, end: b.end! })),
-                data.duration
-              )
-              availableSlots.push(...slots)
-            }
-          }
-
-          return createResponse({ slots: availableSlots })
-        }
-
-        case 'create': {
-          if (!data.endTime || !data.summary) {
-            return createResponse(
-              { error: 'Missing required fields for event creation' },
-              400
-            )
-          }
-
-          const event = await config.calendar.events.insert({
-            calendarId: 'primary',
-            requestBody: {
-              summary: data.summary,
-              description: data.description,
-              start: { dateTime: data.startTime, timeZone: 'UTC' },
-              end: { dateTime: data.endTime, timeZone: 'UTC' },
-              attendees: data.attendees?.map((email) => ({ email })),
-              conferenceData: {
-                createRequest: {
-                  requestId: Date.now().toString(),
-                  conferenceSolutionKey: { type: 'hangoutsMeet' },
-                },
-              },
-            },
-            conferenceDataVersion: 1,
-          })
-
-          return createResponse({
-            id: event.data.id,
-            meetLink: event.data.hangoutLink,
-            startTime: event.data.start?.dateTime,
-            endTime: event.data.end?.dateTime,
-          })
-        }
-
-        default:
-          return createResponse({ error: 'Invalid action' }, 400)
+      const event = {
+        summary: details.purpose,
+        description:
+          details.description || `Meeting with ${details.attendees.join(', ')}`,
+        start: { dateTime: startTime.toISOString() },
+        end: { dateTime: endTime.toISOString() },
+        attendees: details.attendees.map((email: string) => ({ email })),
+        conferenceData: {
+          createRequest: {
+            requestId: `meeting-${Date.now()}`,
+            conferenceSolutionKey: { type: 'hangoutsMeet' },
+          },
+        },
       }
+
+      const response = await calendar.events.insert({
+        calendarId: 'primary',
+        requestBody: event,
+        conferenceDataVersion: 1,
+      })
+
+      return createResponse({
+        data: response.data,
+        status: 200,
+      })
     } catch (error) {
       console.error('Calendar API error:', error)
-      return createResponse({ error: 'Calendar operation failed' }, 500)
+      return createResponse({
+        error: 'Failed to schedule meeting',
+        status: 500,
+      })
     }
   }
 

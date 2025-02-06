@@ -2,10 +2,10 @@ import { cn } from '../lib/utils'
 
 interface TypingIndicatorProps {
   className?: string
-  assistantName: string
+  message?: string
 }
 
-export function TypingIndicator({ className, assistantName }: TypingIndicatorProps) {
+export function TypingIndicator({ className, message = "Typing..." }: TypingIndicatorProps) {
   return (
     <div className={cn(
       "flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400",
@@ -17,7 +17,7 @@ export function TypingIndicator({ className, assistantName }: TypingIndicatorPro
           <span className="relative inline-flex rounded-full h-3 w-3 bg-gray-500"></span>
         </span>
       </div>
-      <span>{assistantName} is typing...</span>
+      <span>{message}</span>
     </div>
   )
 } 

@@ -35,15 +35,15 @@ export function CalendarProvider({ children, calendarService }: CalendarProvider
       scheduleMeeting: async (details: MeetingDetails) => {
         const result = await calendar.scheduleMeeting(details)
 
-        if (!result?.id || !result?.meetLink || !result?.startTime || !result?.endTime) {
+        if (!result?.id || !result?.hangoutLink || !result?.start?.dateTime || !result?.end?.dateTime) {
           throw new Error('Failed to schedule meeting')
         }
 
         return {
           id: result.id,
-          meetLink: result.meetLink,
-          startTime: result.startTime,
-          endTime: result.endTime
+          meetLink: result.hangoutLink,
+          startTime: result.start?.dateTime,
+          endTime: result.end?.dateTime
         }
       },
     }),

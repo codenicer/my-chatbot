@@ -5,7 +5,6 @@ import { ChatProvider } from './chat-provider'
 import { CalendarProvider } from './calendar-provider'
 import { CalendarService, PersonalContext, RateLimitParams } from '@my-chatbot/core'
 import { AIModel } from '@my-chatbot/core'
-import { Redis } from '@upstash/redis'
 
 interface RootProviderProps {
   children: React.ReactNode
@@ -13,7 +12,7 @@ interface RootProviderProps {
   apiKey: string
   calendarService: CalendarService
   model?: AIModel,
-  rateLimit: RateLimitParams
+  rateLimit: RateLimitParams,
 }
 
 export function RootProvider({
@@ -25,7 +24,7 @@ export function RootProvider({
   rateLimit,
 }: RootProviderProps) {
   return (
-    <ChatProvider personalContext={personalContext} apiKey={apiKey} model={model} rateLimit={rateLimit}>
+    <ChatProvider personalContext={personalContext} apiKey={apiKey} model={model} rateLimit={rateLimit} >
       <CalendarProvider calendarService={calendarService}>
         {children}
       </CalendarProvider>

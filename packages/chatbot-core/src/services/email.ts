@@ -36,6 +36,7 @@ export class EmailService {
   }
 
   async sendResume(recipientEmail: string, context: PersonalContext) {
+    console.log('sendResume', recipientEmail, context)
     try {
       const response = await fetch(`${this.baseUrl}/send-resume`, {
         method: 'POST',

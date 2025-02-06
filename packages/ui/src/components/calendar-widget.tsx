@@ -30,8 +30,7 @@ export function CalendarWidget({
   const [meetingDetails, setMeetingDetails] = React.useState<MeetingDetails>({
     purpose: 'interview',
     duration: 30,
-    preferredDates: [],
-    preferredTimeRanges: [],
+    datetime: '',
     attendees: [],
     ...defaultMeetingDetails,
   })
@@ -50,7 +49,7 @@ export function CalendarWidget({
     try {
       const result = await scheduleMeeting({
         ...meetingDetails,
-        preferredDates: [selectedSlot.start.toISOString()],
+        datetime: selectedSlot.start.toISOString(),
       })
       console.log('Meeting scheduled:', result)
     } catch (error) {

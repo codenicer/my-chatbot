@@ -78,7 +78,6 @@ export async function checkRateLimit({
   window = 3600, // 1 hour in seconds
   redis,
 }: RateLimitParams) {
-  console.log('HERE!!,checkRateLimit')
   const key = `rate-limit:${identifier}`
 
   const [count] = await redis.pipeline().incr(key).expire(key, window).exec()

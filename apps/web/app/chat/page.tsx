@@ -34,7 +34,7 @@ export default function ChatPage() {
    information: {
      name: 'Ruther',
      lastName: 'Tenido',
-     email: 'ruther@example.com',
+     email: 'ruthertenido@gmail.com',
      resumeUrl: 'https://codenicer.dev/Tenido-Ruther-V.-Resume.pdf',
      location: {
        city: 'Laguna',
@@ -59,7 +59,7 @@ export default function ChatPage() {
   // Configure rate limit with client IP
   const rateLimit: RateLimitParams = {
     identifier: `chat:${clientIp}`,  // Use IP in identifier
-    limit: 5,
+    limit: 100,
     window: 3600,
     redis,
   }
@@ -77,7 +77,7 @@ export default function ChatPage() {
 
   return (
     <RootProvider
-      key={`chat-provider-${clientIp}`} // Force re-render when IP changes
+      key={`chat-provider-${clientIp}`}
       personalContext={personalContext}
       apiKey={process.env.NEXT_PUBLIC_OPENAI_API_KEY}
       calendarService={calendarService}
@@ -92,7 +92,10 @@ export default function ChatPage() {
           {personalContext.information.name}'s Professional AI Assistant
         </p>
         <div className="max-w-4xl mx-auto">
-          <ChatWidget position="bottom-right" />
+          <ChatWidget 
+            position="bottom-right"
+            assistantImageUrl={personalContext.assistant.avatarUrl}
+          />
         </div>
       </main>
     </RootProvider>
