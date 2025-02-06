@@ -2,7 +2,13 @@ import * as React from 'react'
 import { Button } from './ui/button'
 import { Input } from './ui/input'
 import { Label } from './ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from './ui/select'
 import { MeetingDetails } from '@my-chatbot/core'
 
 interface MeetingDetailsFormProps {
@@ -16,12 +22,12 @@ export function MeetingDetailsForm({
   details,
   onUpdate,
   onFindSlots,
-  isLoading
+  isLoading,
 }: MeetingDetailsFormProps) {
   const handleChange = (field: keyof MeetingDetails, value: any) => {
     onUpdate({
       ...details,
-      [field]: value
+      [field]: value,
     })
   }
 
@@ -31,7 +37,7 @@ export function MeetingDetailsForm({
         <Label htmlFor="purpose">Meeting Purpose</Label>
         <Select
           value={details.purpose}
-          onValueChange={(value: string ) => handleChange('purpose', value)}
+          onValueChange={(value: string) => handleChange('purpose', value)}
           disabled={isLoading}
         >
           <SelectTrigger id="purpose">
@@ -63,20 +69,16 @@ export function MeetingDetailsForm({
         <Label htmlFor="attendees">Attendees (comma-separated)</Label>
         <Input
           id="attendees"
-          value={details.attendees.join(', ')}
-          onChange={(e) => handleChange('attendees', e.target.value.split(',').map(s => s.trim()))}
-          placeholder="email@example.com, another@example.com"
+          value={details.email}
+          onChange={(e) => handleChange('email', e.target.value)}
+          placeholder="email@example.com"
           disabled={isLoading}
         />
       </div>
 
-      <Button 
-        onClick={onFindSlots} 
-        className="w-full"
-        disabled={isLoading}
-      >
+      <Button onClick={onFindSlots} className="w-full" disabled={isLoading}>
         Find Available Slots
       </Button>
     </div>
   )
-} 
+}

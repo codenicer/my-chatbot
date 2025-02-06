@@ -49,11 +49,9 @@ export type ChatError = {
 
 export interface MeetingDetails {
   purpose: string
-  datetime: string
+  date: string
   duration: number
-  attendees: string[]
-  description?: string
-  location?: string
+  email: string
 }
 
 export interface CalendarEvent {

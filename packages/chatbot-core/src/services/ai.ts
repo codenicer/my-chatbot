@@ -95,12 +95,8 @@ export class AIService {
       - Format must be exactly: "SEND_RESUME:email@example.com" (no spaces around the colon)
 
     2. Meeting Scheduling:
-      - When someone wants to schedule a meeting, collect these details:
-        a. Purpose of the meeting (e.g., "initial interview", "technical discussion")
-        b. Preferred date and time (ask for their timezone)
-        c. Expected duration
-        d. Attendees (their email addresses)
-      - When you have all meeting details, include "SCHEDULE_MEETING:[details]" in your response
+      - When someone wants to schedule a meeting, respond with: "I'll help you schedule a meeting with ${context.information.name}. SHOW_MEETING_FORM"
+      - Do not ask for meeting details, the form will collect them
     
     Example Resume Flow:
       User: "Can I see the resume?"
@@ -121,6 +117,7 @@ export class AIService {
   }
 
   async parseMeetingInfo(message: string): Promise<ParsedMeetingInfo> {
+    console.log('parseMeetingInfo-message', message)
     try {
       const completion = await this.openai.chat.completions.create({
         messages: [
