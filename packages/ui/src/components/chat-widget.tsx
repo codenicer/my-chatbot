@@ -16,8 +16,8 @@ import { cn } from '../lib/utils'
 import { TypingIndicator } from './typing-indicator'
 import { Label } from './ui/label'
 import { Input } from './ui/input'
-import { ChatTheme, defaultTheme } from '@my-chatbot/core'
-
+import { defaultTheme } from '@my-chatbot/core'
+import { ChatTheme } from '@my-chatbot/core'
 export interface ChatWidgetProps {
   position?: 'bottom-right' | 'bottom-left'
 }
