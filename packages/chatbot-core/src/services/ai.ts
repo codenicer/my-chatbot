@@ -1,13 +1,15 @@
 'use client'
 
 import OpenAI from 'openai'
-import { PersonalContext, ChatMessage } from '../types'
+import { GoogleGenerativeAI } from '@google/generative-ai'
+import {
+  AIProvider,
+  AIModelConfig,
+  PersonalContext,
+  ChatMessage,
+} from '../types'
+
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
-export type AIModel =
-  | 'gpt-4'
-  | 'gpt-3.5-turbo'
-  | 'gpt-4-turbo-preview'
-  | 'gpt-4o-mini'
 
 interface ParsedMeetingInfo {
   type: 'meeting_info'
@@ -20,15 +22,27 @@ interface ParsedMeetingInfo {
 }
 
 export class AIService {
-  private openai: OpenAI
-  private model: AIModel
+  private openai?: OpenAI
+  private genAI?: GoogleGenerativeAI
+  private config: AIModelConfig
 
-  constructor(apiKey: string, model: AIModel = 'gpt-4o-mini') {
-    this.openai = new OpenAI({
-      apiKey,
-      dangerouslyAllowBrowser: true, // Enable client-side usage
-    })
-    this.model = model
+  constructor(config: AIModelConfig) {
+    this.config = config
+
+    switch (config.provider) {
+      case 'openai':
+        this.openai = new OpenAI({
+          apiKey: config.apiKey,
+          dangerouslyAllowBrowser: true,
+        })
+        break
+      case 'gemini':
+        console.log('gemini', config.apiKey)
+        this.genAI = new GoogleGenerativeAI(config.apiKey)
+        break
+      default:
+        throw new Error(`Unsupported AI provider: ${config.provider}`)
+    }
   }
 
   async getResponse(
@@ -37,26 +51,72 @@ export class AIService {
     systemPrompt?: string
   ): Promise<ChatMessage> {
     try {
-      const completion = await this.openai.chat.completions.create({
-        messages: [
-          {
-            role: 'system',
-            content: systemPrompt || this.createSystemPrompt(context),
-          },
-          { role: 'user', content: message },
-        ],
-        model: this.model,
-      })
-
-      return {
-        id: completion.id,
-        role: 'assistant',
-        content: completion.choices[0]?.message?.content || '',
-        timestamp: Date.now(),
+      switch (this.config.provider) {
+        case 'openai':
+          return await this.getOpenAIResponse(message, context, systemPrompt)
+        case 'gemini':
+          return await this.getGeminiResponse(message, context, systemPrompt)
+        default:
+          throw new Error(`Unsupported AI provider: ${this.config.provider}`)
       }
     } catch (error) {
-      console.error('OpenAI API error:', error)
+      console.error('AI Service error:', error)
       throw new Error('Failed to get AI response')
+    }
+  }
+
+  private async getOpenAIResponse(
+    message: string,
+    context: PersonalContext,
+    systemPrompt?: string
+  ): Promise<ChatMessage> {
+    if (!this.openai) throw new Error('OpenAI not initialized')
+
+    const completion = await this.openai.chat.completions.create({
+      messages: [
+        {
+          role: 'system',
+          content: systemPrompt || this.createSystemPrompt(context),
+        },
+        { role: 'user', content: message },
+      ],
+      model: this.config.model || 'gpt-4o-mini',
+      temperature: this.config.temperature || 0.7,
+    })
+
+    return {
+      id: completion.id,
+      role: 'assistant',
+      content: completion.choices[0]?.message?.content || '',
+      timestamp: Date.now(),
+    }
+  }
+
+  private async getGeminiResponse(
+    message: string,
+    context: PersonalContext,
+    systemPrompt?: string
+  ): Promise<ChatMessage> {
+    if (!this.genAI) throw new Error('Gemini AI not initialized')
+
+    const model = this.genAI.getGenerativeModel({
+      model: this.config.model || 'gemini-2.0-flash',
+      generationConfig: {
+        temperature: this.config.temperature || 1,
+        responseMimeType: 'text/plain',
+      },
+    })
+
+    const prompt = `${systemPrompt || this.createSystemPrompt(context)}\n\nUser: ${message}`
+    const result = await model.generateContent(prompt)
+    const response = result.response
+    const text = response.text()
+
+    return {
+      id: Math.random().toString(36).substring(7),
+      role: 'assistant',
+      content: text,
+      timestamp: Date.now(),
     }
   }
 
@@ -114,49 +174,5 @@ export class AIService {
     
     Remember: You are speaking TO recruiters ABOUT ${context.information.name}, not as them.
     Always include SEND_RESUME:[email] in your response when you have an email address.`
-  }
-
-  async parseMeetingInfo(message: string): Promise<ParsedMeetingInfo> {
-    console.log('parseMeetingInfo-message', message)
-    try {
-      const completion = await this.openai.chat.completions.create({
-        messages: [
-          {
-            role: 'system',
-            content: `You are a meeting information parser. Extract meeting details from the message and return them in a specific format.
-            If the message contains any meeting-related information, respond with a JSON object containing the found details.
-            
-            Rules:
-            - Extract purpose if message mentions interview, discussion, meeting purpose, etc.
-            - Convert all times to ISO format with timezone
-            - Convert duration to minutes
-            - Extract email addresses
-            - Only include fields that are clearly mentioned
-            
-            Example Input: "let's meet tomorrow 3pm manila time for technical interview"
-            Example Output: {
-              "purpose": "technical interview",
-              "datetime": "2024-02-07T15:00:00+08:00"
-            }
-            
-            Only respond with the JSON object, nothing else.`,
-          },
-          { role: 'user', content: message },
-        ],
-        model: this.model,
-        response_format: { type: 'json_object' },
-      })
-
-      await delay(5000) // 5 second delay
-
-      const parsed = JSON.parse(completion.choices[0]?.message?.content || '{}')
-      return {
-        type: 'meeting_info',
-        details: parsed,
-      }
-    } catch (error) {
-      console.error('Failed to parse meeting info:', error)
-      return { type: 'meeting_info' }
-    }
   }
 }

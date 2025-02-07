@@ -85,9 +85,11 @@ export default function ChatPage() {
     <RootProvider
       key={`chat-provider-${clientIp}`}
       personalContext={personalContext}
-      apiKey={process.env.NEXT_PUBLIC_OPENAI_API_KEY}
-      calendarService={calendarService}
-      model="gpt-4o-mini"
+      aiConfig={{
+        provider: 'gemini',
+        apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY!,
+        model: 'gemini-2.0-flash',
+      }}
       rateLimit={rateLimit}
     >
       <main className="min-h-screen p-4 bg-white dark:bg-gray-900">

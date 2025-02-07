@@ -1,7 +1,5 @@
 'use client'
 
-import { MeetingDetails, CalendarEvent } from '../types'
-
 export class CalendarService {
   async scheduleMeeting(details: {
     purpose: string

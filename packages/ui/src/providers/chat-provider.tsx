@@ -9,6 +9,7 @@ import {
   EmailService,
   RateLimitParams,
   MeetingDetails,
+  AIModelConfig,
 } from '@my-chatbot/core'
 import { useChat } from '../hooks/use-chat'
 import { checkRateLimit } from '@my-chatbot/core'
@@ -35,8 +36,7 @@ export const ChatContext = React.createContext<ChatContextValue | null>(null)
 interface ChatProviderProps {
   children: React.ReactNode
   personalContext: PersonalContext
-  apiKey: string
-  model?: AIModel
+  aiConfig: AIModelConfig
   rateLimit: RateLimitParams
 }
 
@@ -51,14 +51,10 @@ interface MeetingContextState {
 export function ChatProvider({
   children,
   personalContext,
-  apiKey,
-  model = 'gpt-4o-mini',
+  aiConfig,
   rateLimit,
 }: ChatProviderProps) {
-  const aiService = React.useMemo(
-    () => new AIService(apiKey, model),
-    [apiKey, model]
-  )
+  const aiService = React.useMemo(() => new AIService(aiConfig), [aiConfig])
   const emailService = React.useMemo(() => new EmailService(), [])
   const { messages, isLoading, setMessages, setIsLoading } = useChat()
   const calendarService = React.useMemo(() => new CalendarService(), [])

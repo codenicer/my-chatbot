@@ -9,9 +9,10 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.21.0",
     "@types/node": "^20.0.0",
-    "@upstash/redis": "^1.28.4",
     "@types/nodemailer": "^6.4.14",
+    "@upstash/redis": "^1.28.4",
     "axios": "^1.6.7",
     "googleapis": "^133.0.0",
     "next": "^14.0.0",
@@ -19,7 +20,6 @@
     "redis": "^4.6.13"
   },
   "devDependencies": {
-   
     "typescript": "^5.3.3"
   },
   "peerDependencies": {
