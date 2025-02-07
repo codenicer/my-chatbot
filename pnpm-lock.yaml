@@ -21,8 +21,8 @@ importers:
   apps/web:
     dependencies:
       '@my-chatbot/core':
-        specifier: ^0.1.0
-        version: 0.1.0(next@15.1.6(react-dom@19.0.0(react@19.0.0))(react@19.0.0))
+        specifier: ^0.1.1
+        version: 0.1.1(next@15.1.6(react-dom@19.0.0(react@19.0.0))(react@19.0.0))
       '@my-chatbot/ui':
         specifier: workspace:^
         version: link:../../packages/ui
@@ -172,8 +172,8 @@ importers:
   packages/ui:
     dependencies:
       '@my-chatbot/core':
-        specifier: ^0.1.0
-        version: 0.1.0(next@15.1.6(react-dom@19.0.0(react@19.0.0))(react@19.0.0))
+        specifier: ^0.1.1
+        version: 0.1.1(next@15.1.6(react-dom@19.0.0(react@19.0.0))(react@19.0.0))
       '@radix-ui/react-dialog':
         specifier: ^1.1.5
         version: 1.1.5(@types/react-dom@18.3.5(@types/react@18.3.18))(@types/react@18.3.18)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
@@ -448,8 +448,8 @@ packages:
   '@jridgewell/trace-mapping@0.3.25':
     resolution: {integrity: sha512-vNk6aEwybGtawWmy/PzwnGDOjCkLWSD2wqvjGGAgOAwCGWySYXfYoxt00IJkTF+8Lb57DwOb3Aa0o9CApepiYQ==}
 
-  '@my-chatbot/core@0.1.0':
-    resolution: {integrity: sha512-6CpTdobnXABVwQzqyimHp7nOYIfZV59DrDzL12tNedkefsLstTihWDW/LaNhhBd6ND+3d40VFS0UAp4pL/76rg==}
+  '@my-chatbot/core@0.1.1':
+    resolution: {integrity: sha512-s4Wr1LYIqGOCt6vez1AIwqNBP6Z219beEaL+AgY2jvz+gwKn11Tugn0P1/FrDh2oD9JyhWrd6TO2jDXbp5/PdQ==}
     peerDependencies:
       next: ^14.0.0
 
@@ -2836,7 +2836,7 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.0
 
-  '@my-chatbot/core@0.1.0(next@15.1.6(react-dom@19.0.0(react@19.0.0))(react@19.0.0))':
+  '@my-chatbot/core@0.1.1(next@15.1.6(react-dom@19.0.0(react@19.0.0))(react@19.0.0))':
     dependencies:
       '@google/generative-ai': 0.21.0
       '@types/node': 20.17.16
