@@ -4,7 +4,7 @@ import { PersonalContext } from '../types'
 
 export class EmailService {
   private baseUrl: string
-  private headers: HeadersInit
+  private headers: Record<string, string>
 
   constructor() {
     this.baseUrl = '/api/email'

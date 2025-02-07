@@ -1,9 +1,9 @@
 {
   "name": "@my-chatbot/core",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "private": false,
   "main": "./src/index.ts",
-  "types": "./src/index.ts",
+  "types": "./src/types.ts",
   "scripts": {
     "lint": "eslint . --max-warnings 0",
     "type-check": "tsc --noEmit"

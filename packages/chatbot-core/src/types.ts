@@ -1,3 +1,5 @@
+import { Redis } from '@upstash/redis'
+
 export type PersonalContext = {
   assistant: {
     name: string
@@ -112,4 +114,10 @@ export type AIModelConfig = {
   model?: string
   apiKey: string
   temperature?: number
+}
+export interface RateLimitParams {
+  identifier: string
+  limit: number
+  window: number
+  redis: Redis
 }

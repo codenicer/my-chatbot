@@ -1,5 +1,6 @@
 import { ApiResponse, createResponse } from './utils'
 import { Redis } from '@upstash/redis'
+import { RateLimitParams } from '../types'
 
 export interface RateLimitConfig {
   redis: Redis
@@ -18,7 +19,6 @@ export function createRateLimitHandler(config: RateLimitConfig) {
   const WINDOW = config.windowInSeconds || 60 * 60 // 1 hour in seconds
 
   async function POST(request: RateLimitRequest): Promise<ApiResponse> {
-    console.log('HERE!!')
     try {
       const ip = request.headers.get('x-forwarded-for') || 'unknown'
       const key = `rate_limit:${ip}`
@@ -63,13 +63,6 @@ export function createRateLimitHandler(config: RateLimitConfig) {
   }
 
   return { GET, POST }
-}
-
-export interface RateLimitParams {
-  identifier: string // Usually IP address or user ID
-  limit: number // Max requests per window
-  window: number // Time window in seconds
-  redis: Redis // Redis client instance
 }
 
 export async function checkRateLimit({

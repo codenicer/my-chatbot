@@ -1,5 +1,5 @@
 {
-  "extends": "@codenicer/chatbot-typescript-config/base.json",
+  "extends": "../typescript-config/base.json",
   "compilerOptions": {
     "moduleResolution": "NodeNext",
     "module": "NodeNext",
@@ -8,7 +8,12 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
-    }
+    },
+    "declaration": true,
+    "esModuleInterop": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true, // VERY IMPORTANT!
   },
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules", "dist"]

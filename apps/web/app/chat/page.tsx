@@ -1,10 +1,6 @@
 'use client'
 
-import {
-  PersonalContext,
-  CalendarService,
-  RateLimitParams,
-} from '@my-chatbot/core'
+import { PersonalContext, RateLimitParams } from '@my-chatbot/core'
 import { RootProvider, ChatWidget } from '@my-chatbot/ui'
 import { Redis } from '@upstash/redis'
 import { useEffect, useState } from 'react'

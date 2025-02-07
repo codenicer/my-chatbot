@@ -2,7 +2,7 @@
 
 export class RateLimitService {
   private baseUrl: string
-  private headers: HeadersInit
+  private headers: Record<string, string>
 
   constructor() {
     this.baseUrl = '/api/rate-limit'
@@ -19,7 +19,7 @@ export class RateLimitService {
       })
 
       if (!response.ok) {
-        const error = await response.json()
+        const error = (await response.json()) as { message: string }
         throw new Error(error.message || 'Rate limit exceeded')
       }
     } catch (error) {
@@ -38,7 +38,11 @@ export class RateLimitService {
         throw new Error('Failed to get rate limit info')
       }
 
-      const data = await response.json()
+      const data = (await response.json()) as {
+        remaining: number
+        reset: number
+        total: number
+      }
       return {
         remaining: data.remaining,
         reset: data.reset,

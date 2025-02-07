@@ -39,7 +39,11 @@ export class CalendarService {
         throw new Error('Failed to schedule meeting')
       }
 
-      const result = await response.json()
+      const result = (await response.json()) as {
+        id: string
+        hangoutLink: string
+        htmlLink: string
+      }
       return {
         id: result.id,
         hangoutLink: result.hangoutLink,
