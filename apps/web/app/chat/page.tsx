@@ -17,7 +17,6 @@ const redis = new Redis({
 
 export default function ChatPage() {
   const [clientIp, setClientIp] = useState<string>('unknown')
-  const calendarService = new CalendarService()
   const personalContext: PersonalContext = {
     assistant: {
       name: 'Taiga',
@@ -88,7 +87,7 @@ export default function ChatPage() {
       aiConfig={{
         provider: 'gemini',
         apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY!,
-        model: 'gemini-2.0-flash',
+        model: 'gemini-2.0-flash-lite-preview-02-05',
       }}
       rateLimit={rateLimit}
     >

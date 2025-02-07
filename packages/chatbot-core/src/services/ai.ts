@@ -37,7 +37,6 @@ export class AIService {
         })
         break
       case 'gemini':
-        console.log('gemini', config.apiKey)
         this.genAI = new GoogleGenerativeAI(config.apiKey)
         break
       default:

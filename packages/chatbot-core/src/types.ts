@@ -109,15 +109,7 @@ export type AIProvider = 'openai' | 'gemini'
 
 export type AIModelConfig = {
   provider: AIProvider
-  model?: AIModel
+  model?: string
   apiKey: string
   temperature?: number
 }
-
-// Update existing types
-export type AIModel =
-  | 'gpt-4'
-  | 'gpt-4o-mini'
-  | 'gpt-4-turbo-preview'
-  | 'gemini-2.0-flash-lite'
-  | 'gemini-2.0-flash'

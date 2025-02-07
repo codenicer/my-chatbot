@@ -5,7 +5,6 @@ import {
   AIService,
   PersonalContext,
   ChatMessage,
-  AIModel,
   EmailService,
   RateLimitParams,
   MeetingDetails,
@@ -182,9 +181,6 @@ export function ChatProvider({
       personalContext,
       setMessages,
       calendarService,
-      meetingContext,
-      updateMeetingContext,
-      aiService,
       setShowMeetingForm,
     ]
   )
@@ -319,7 +315,7 @@ export function ChatProvider({
         setIsLoading(false)
       }
     },
-    [calendarService, setMessages]
+    [calendarService, setIsLoading, setMessages]
   )
 
   const value = React.useMemo(
