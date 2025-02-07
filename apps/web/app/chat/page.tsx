@@ -1,6 +1,10 @@
 'use client'
 
-import { PersonalContext, CalendarService, RateLimitParams } from '@my-chatbot/core'
+import {
+  PersonalContext,
+  CalendarService,
+  RateLimitParams,
+} from '@my-chatbot/core'
 import { RootProvider, ChatWidget } from '@my-chatbot/ui'
 import { Redis } from '@upstash/redis'
 import { useEffect, useState } from 'react'
@@ -15,58 +19,60 @@ export default function ChatPage() {
   const [clientIp, setClientIp] = useState<string>('unknown')
   const calendarService = new CalendarService()
   const personalContext: PersonalContext = {
-   assistant: {
-     name: 'Taiga',
-   },
-   professional: {
-     currentRole: 'Full Stack Web Developer',
-     company: 'Dashlabs.ai',
-     skills: [
-       { name: 'JavaScript', experience: 5 },
-       { name: 'CSS', experience: 5 },
-       { name: 'PHP', experience: 5 },
-       { name: 'Typescript', experience: 5 },
-     ],
-     experience: 5,
-     currentRoutine: '9-5',
-     jobSearchStatus: 'active',
-   },
-   information: {
-     name: 'Ruther',
-     lastName: 'Tenido',
-     email: 'ruthertenido@gmail.com',
-     resumeUrl: 'https://codenicer.dev/Tenido-Ruther-V.-Resume.pdf',
-     location: {
-       city: 'Laguna',
-       country: 'Philippines',
-     },
-   },
-   preferences: {
-     minSalary: 100000,
-     location: 'Laguna',
-     remoteWork: true,
-   },
- };
+    assistant: {
+      name: 'Taiga',
+    },
+    professional: {
+      currentRole: 'Full Stack Web Developer',
+      company: 'Dashlabs.ai',
+      skills: [
+        { name: 'JavaScript', experience: 5 },
+        { name: 'CSS', experience: 5 },
+        { name: 'PHP', experience: 5 },
+        { name: 'Typescript', experience: 5 },
+      ],
+      experience: 5,
+      currentRoutine: '9-5',
+      jobSearchStatus: 'active',
+    },
+    information: {
+      name: 'Ruther',
+      lastName: 'Tenido',
+      email: 'ruthertenido@gmail.com',
+      resumeUrl: 'https://codenicer.dev/Tenido-Ruther-V.-Resume.pdf',
+      location: {
+        city: 'Laguna',
+        country: 'Philippines',
+      },
+    },
+    preferences: {
+      minSalary: 100000,
+      location: 'Laguna',
+      remoteWork: true,
+    },
+  }
 
   useEffect(() => {
     // Fetch client IP on component mount
     fetch('/api/client-ip')
-      .then(res => res.json())
-      .then(data => setClientIp(data.ip))
+      .then((res) => res.json())
+      .then((data) => setClientIp(data.ip))
       .catch(console.error)
   }, [])
 
   // Configure rate limit with client IP
   const rateLimit: RateLimitParams = {
-    identifier: `chat:${clientIp}`,  // Use IP in identifier
+    identifier: `chat:${clientIp}`, // Use IP in identifier
     limit: 100,
     window: 3600,
     redis,
   }
 
-  console.log('rateLimit', rateLimit)
-
-  if (!process.env.NEXT_PUBLIC_OPENAI_API_KEY || !process.env.NEXT_PUBLIC_REDIS_URL || !process.env.NEXT_PUBLIC_REDIS_TOKEN) {
+  if (
+    !process.env.NEXT_PUBLIC_OPENAI_API_KEY ||
+    !process.env.NEXT_PUBLIC_REDIS_URL ||
+    !process.env.NEXT_PUBLIC_REDIS_TOKEN
+  ) {
     return (
       <div className="p-4">
         <h1 className="text-2xl font-bold text-red-500">Error</h1>
@@ -92,7 +98,7 @@ export default function ChatPage() {
           {personalContext.information.name}'s Professional AI Assistant
         </p>
         <div className="max-w-4xl mx-auto">
-          <ChatWidget 
+          <ChatWidget
             position="bottom-right"
             assistantImageUrl={personalContext.assistant.avatarUrl}
           />

@@ -1,58 +1,150 @@
-# Turborepo Tailwind CSS starter
+# AI Chat Assistant Widget
 
-This Turborepo starter is maintained by the Turborepo core team.
+A customizable AI chat widget for Next.js portfolio websites. Built with TypeScript, Tailwind CSS, and OpenAI.
 
-## Using this example
+![Chat Widget Demo](demo.gif)
 
-Run the following command:
+## Features
 
-```sh
-npx create-turbo@latest -e with-tailwind
+- 🎨 Fully customizable theming
+- 💬 OpenAI-powered chat
+- 📧 Resume sharing capability
+- 📅 Meeting scheduling (coming soon)
+- ⚡ Built with performance in mind
+- 🎯 TypeScript & Tailwind CSS
+
+## Installation
+
+```bash
+npm install @my-chatbot/ui @my-chatbot/core
 ```
 
-## What's inside?
+## Environment Variables
 
-This Turborepo includes the following packages/apps:
+Create a `.env.local` file in your project root:
 
-### Apps and Packages
+```env
+# Required
+NEXT_PUBLIC_OPENAI_API_KEY=your_openai_api_key
+NEXT_PUBLIC_REDIS_URL=your_redis_url
+NEXT_PUBLIC_REDIS_TOKEN=your_redis_token
 
-- `docs`: a [Next.js](https://nextjs.org/) app with [Tailwind CSS](https://tailwindcss.com/)
-- `web`: another [Next.js](https://nextjs.org/) app with [Tailwind CSS](https://tailwindcss.com/)
-- `ui`: a stub React component library with [Tailwind CSS](https://tailwindcss.com/) shared by both `web` and `docs` applications
-- `@my-chatbot/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@my-chatbot/typescript-config`: `tsconfig.json`s used throughout the monorepo
+# Email Configuration
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=465
+SMTP_USER=[your-email]@gmail.com
+SMTP_PASS="your-email-password"
+SMTP_FROM="[your-name] <your-email@gmail.com>"
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
 
-### Building packages/ui
-
-This example is set up to produce compiled styles for `ui` components into the `dist` directory. The component `.tsx` files are consumed by the Next.js apps directly using `transpilePackages` in `next.config.js`. This was chosen for several reasons:
-
-- Make sharing one `tailwind.config.js` to apps and packages as easy as possible.
-- Make package compilation simple by only depending on the Next.js Compiler and `tailwindcss`.
-- Ensure Tailwind classes do not overwrite each other. The `ui` package uses a `ui-` prefix for it's classes.
-- Maintain clear package export boundaries.
-
-Another option is to consume `packages/ui` directly from source without building. If using this option, you will need to update the `tailwind.config.js` in your apps to be aware of your package locations, so it can find all usages of the `tailwindcss` class names for CSS compilation.
-
-For example, in [tailwind.config.js](packages/tailwind-config/tailwind.config.js):
-
-```js
-  content: [
-    // app content
-    `src/**/*.{js,ts,jsx,tsx}`,
-    // include packages if not transpiling
-    "../../packages/ui/*.{js,ts,jsx,tsx}",
-  ],
+# Optional (Calendar Integration - Coming Soon)
+NEXT_PUBLIC_CALENDAR_EMAIL=your_google_service_account_email
+NEXT_PUBLIC_CALENDAR_PRIVATE_KEY=your_google_private_key
 ```
 
-If you choose this strategy, you can remove the `tailwindcss` and `autoprefixer` dependencies from the `ui` package.
+## Usage
 
-### Utilities
+```typescript
+import { RootProvider, ChatWidget } from '@my-chatbot/ui'
 
-This Turborepo has some additional tools already setup for you:
+// Your theme
+const theme = {
+  primary: {
+    background: '#0A0F1C',
+    text: '#FFFFFF',
+  },
+  secondary: {
+    background: '#B08968',
+    text: '#0A0F1C',
+  },
+  accent: {
+    background: '#0EA5E9',
+    text: '#FFFFFF',
+  },
+  neutral: {
+    background: '#1E293B',
+    text: '#94A3B8',
+    border: '#334155',
+  }
+}
 
-- [Tailwind CSS](https://tailwindcss.com/) for styles
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
+// Add to your app
+function App() {
+  return (
+    <RootProvider
+      personalContext={{
+        assistant: {
+          name: "Taiga", // Your AI assistant name
+        },
+        information: {
+          name: "Your Name",
+          email: "your@email.com",
+          // ... other details
+        },
+      }}
+      apiKey={process.env.NEXT_PUBLIC_OPENAI_API_KEY}
+      rateLimit={{
+        limit: 10,
+        window: 3600,
+        redis: {
+          url: process.env.NEXT_PUBLIC_REDIS_URL,
+          token: process.env.NEXT_PUBLIC_REDIS_TOKEN
+        }
+      }}
+    >
+      <ChatWidget
+        theme={theme}
+        position="bottom-right"
+      />
+    </RootProvider>
+  )
+}
+```
+
+## Configuration
+
+### Personal Context
+
+The `personalContext` object allows you to customize the AI assistant's knowledge about you:
+
+```typescript
+interface PersonalContext {
+  assistant: {
+    name: string
+    avatarUrl?: string
+  }
+  information: {
+    name: string
+    email: string
+    resumeUrl: string
+    // ... other fields
+  }
+  // ... see types for full configuration
+}
+```
+
+### Rate Limiting
+
+Rate limiting is handled through Upstash Redis. Configure limits with:
+
+```typescript
+interface RateLimitConfig {
+  limit: number // Max requests per window
+  window: number // Time window in seconds
+  redis: {
+    url: string
+    token: string
+  }
+}
+```
+
+## License
+
+MIT © [Ruther Teñido](https://github.com/codenicer)
+
+## Author
+
+- [Ruther Teñido](https://github.com/codenicer)
+- [Portfolio](https://codenicer.dev)
+
+If you use this project, please consider giving it a ⭐️

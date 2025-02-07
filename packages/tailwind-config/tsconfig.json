@@ -1,5 +1,5 @@
 {
-  "extends": "@my-chatbot/typescript-config/base.json",
+  "extends": "@codenicer/chatbot-typescript-config/base.json",
   "include": ["."],
   "exclude": ["dist", "build", "node_modules"]
 }
