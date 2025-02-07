@@ -1,12 +1,28 @@
 {
   "name": "@my-chatbot/core",
   "version": "0.1.4",
+  "author": "Ruther Teñido",
+  "license": "MIT",
   "private": false,
-  "main": "./src/index.ts",
-  "types": "./src/types.ts",
+  "keywords": [
+   "chatbot",
+   "ai",
+   "nextjs",
+   "portfolio",
+   "typescript",
+   "tailwindcss"
+ ],
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "git-checks": false,
+  "files": [
+    "dist/**"
+  ],
   "scripts": {
-    "lint": "eslint . --max-warnings 0",
-    "type-check": "tsc --noEmit"
+    "build": "tsup src/index.ts --format esm,cjs --dts",
+    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
+    "dev": "tsup src/index.ts --format esm,cjs --watch --dts"
   },
   "dependencies": {
     "@google/generative-ai": "^0.21.0",
@@ -17,7 +33,8 @@
     "googleapis": "^133.0.0",
     "next": "^14.0.0",
     "openai": "^4.28.0",
-    "redis": "^4.6.13"
+    "redis": "^4.6.13",
+    "tsup": "^8.3.6"
   },
   "devDependencies": {
     "typescript": "^5.3.3"
