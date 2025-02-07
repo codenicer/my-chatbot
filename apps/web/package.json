@@ -11,7 +11,7 @@
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
-    "@my-chatbot/core": "workspace:^",
+    "@my-chatbot/core": "^0.1.0",
     "@my-chatbot/ui": "workspace:^",
     "@types/nodemailer": "^6.4.14",
     "@upstash/redis": "^1.28.4",
