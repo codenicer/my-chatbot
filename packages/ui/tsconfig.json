@@ -1,18 +1,19 @@
 {
   "extends": [
     "../typescript-config/react-library.json",
-    "../typescript-config/nextjs.json",
   ],
   "compilerOptions": {
     "jsx": "react-jsx",
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
-    "target": "ES6",
+    "target": "ES2020",
     "paths": {
       "react": ["./node_modules/@types/react"],
-    }
+    },
+    "allowSyntheticDefaultImports": true,
+    "outDir": "dist"
   },
   "include": ["src/**/*.ts", "src/**/*.tsx"],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "dist"]
 }
