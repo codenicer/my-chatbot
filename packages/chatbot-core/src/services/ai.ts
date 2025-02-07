@@ -9,8 +9,6 @@ import {
   ChatMessage,
 } from '../types'
 
-const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
-
 interface ParsedMeetingInfo {
   type: 'meeting_info'
   details?: {
