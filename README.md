@@ -1,6 +1,6 @@
 # AI Chat Assistant Widget
 
-A customizable AI chat widget for Next.js portfolio websites. Built with TypeScript, Tailwind CSS, and OpenAI.
+A customizable AI chat widget for Next.js portfolio websites. Built with TypeScript, Tailwind CSS, and OpenAI/Gemini.
 
 ![Chat Widget Demo](demo.gif)
 
@@ -13,128 +13,63 @@ A customizable AI chat widget for Next.js portfolio websites. Built with TypeScr
 - ⚡ Built with performance in mind
 - 🎯 TypeScript & Tailwind CSS
 
-## Setup Guide
+## Quick Start
 
 ### 1. Installation
 
 ```bash
-npm install @my-chatbot/ui @my-chatbot/core
+# For Next.js >= 15
+npm install @my-chatbot/ui @my-chatbot/core @upstash/redis
+
+# For Next.js < 15, use legacy peer deps
+npm install @my-chatbot/ui @my-chatbot/core @upstash/redis --legacy-peer-deps
 ```
 
-### 2. Environment Variables
+### 2. Required Dependencies
 
-Create a `.env.local` file in your project root:
+Add these to your project's dependencies:
 
-```env
-# Required
-NEXT_PUBLIC_OPENAI_API_KEY=your_openai_api_key
-NEXT_PUBLIC_REDIS_URL=your_redis_url
-NEXT_PUBLIC_REDIS_TOKEN=your_redis_token
-
-# Email Configuration
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=465
-SMTP_USER=[your-email]@gmail.com
-SMTP_PASS="your-email-password"
-SMTP_FROM="[your-name] <your-email@gmail.com>"
-
-# Optional (Calendar Integration)
-NEXT_PUBLIC_CALENDAR_EMAIL=your_google_service_account_email
-NEXT_PUBLIC_CALENDAR_PRIVATE_KEY=your_google_private_key
-```
-
-### 3. API Setup
-
-1. First, set up CORS middleware for all API routes. Create `middleware.ts` in your app root:
-
-```typescript:middleware.ts
-import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
-
-export function middleware(request: NextRequest) {
-  const response = NextResponse.next()
-
-  // Add CORS headers
-  response.headers.set('Access-Control-Allow-Origin', '*')
-  response.headers.set(
-    'Access-Control-Allow-Methods',
-    'GET, POST, PUT, DELETE, OPTIONS'
-  )
-  response.headers.set(
-    'Access-Control-Allow-Headers',
-    'Content-Type, Authorization'
-  )
-
-  return response
-}
-
-export const config = {
-  matcher: '/api/:path*',
+```json
+{
+  "dependencies": {
+    "@my-chatbot/core": "0.1.5",
+    "@my-chatbot/ui": "1.0.1",
+    "@upstash/redis": "^1.28.4",
+    "next": "^15.1.6",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  }
 }
 ```
 
-2. Create required API routes:
+### 3. Add to Layout And Tailwind Config
 
-```typescript:app/api/email/send-resume/route.ts
-import { EmailHandler } from '@my-chatbot/core'
-import { NextResponse } from 'next/server'
+Sample tailwind config:
 
-const emailHandler = new EmailHandler({
-  smtp: {
-    host: process.env.SMTP_HOST!,
-    port: parseInt(process.env.SMTP_PORT!),
-    auth: {
-      user: process.env.SMTP_USER!,
-      pass: process.env.SMTP_PASS!,
+```ts
+import type { Config } from 'tailwindcss'
+import sharedConfig from '@my-chatbot/ui/tailwind.config'
+
+const config: Config = {
+  content: ['./node_modules/@my-chatbot/ui/**/*.{js,ts,jsx,tsx}'],
+  theme: {
+    extend: {
+      colors: {
+        background: 'var(--background)',
+        foreground: 'var(--foreground)',
+      },
     },
   },
-  from: process.env.SMTP_FROM!,
-})
+  presets: [sharedConfig],
+} satisfies Config
 
-export async function POST(request: Request) {
-  try {
-    const body = await request.json()
-    const result = await emailHandler.sendResume(body)
-    return NextResponse.json(result)
-  } catch (error) {
-    return NextResponse.json(
-      { error: 'Failed to send email' },
-      { status: 500 }
-    )
-  }
-}
+export default config
 ```
 
-```typescript:app/api/rate-limit/route.ts
-import { RateLimitHandler } from '@my-chatbot/core'
-import { NextResponse } from 'next/server'
+In your `app/layout.tsx`:
 
-const rateLimitHandler = new RateLimitHandler({
-  redis: {
-    url: process.env.NEXT_PUBLIC_REDIS_URL!,
-    token: process.env.NEXT_PUBLIC_REDIS_TOKEN!,
-  },
-})
-
-export async function POST(request: Request) {
-  try {
-    const body = await request.json()
-    const result = await rateLimitHandler.checkLimit(body)
-    return NextResponse.json(result)
-  } catch (error) {
-    return NextResponse.json(
-      { error: 'Rate limit check failed' },
-      { status: 500 }
-    )
-  }
-}
-```
-
-### 4. Component Setup
-
-Add the chat widget to your app:
-
-```typescript:app/layout.tsx
+```tsx
+import '@my-chatbot/ui/dist/index.css' // Add this import
 import { RootProvider, ChatWidget } from '@my-chatbot/ui'
 
 export default function RootLayout({
@@ -143,36 +78,58 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html>
+    <html lang="en">
       <body>
         {children}
         <RootProvider
           personalContext={{
             assistant: {
-              name: "Taiga",
+              name: 'Your Assistant Name',
+            },
+            professional: {
+              currentRole: 'Your Role',
+              company: 'Your Company',
+              skills: [
+                { name: 'Skill 1', experience: 5 },
+                { name: 'Skill 2', experience: 3 },
+              ],
+              experience: 5,
+              currentRoutine: '9-5',
+              jobSearchStatus: 'active',
             },
             information: {
-              name: "Your Name",
-              email: "your@email.com",
-              // See types for full configuration
+              name: 'Your Name',
+              lastName: 'Your Last Name',
+              email: 'your@email.com',
+              resumeUrl: 'https://your-resume-url.pdf',
+              location: {
+                city: 'Your City',
+                country: 'Your Country',
+              },
+            },
+            preferences: {
+              minSalary: 95000,
+              maxSalary: 250000,
+              location: 'Your Location',
+              remoteWork: true,
             },
           }}
           aiConfig={{
-            // Choose your AI provider
             provider: 'openai', // or 'gemini'
             apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY!,
             model: 'gpt-4-turbo-preview', // optional
           }}
           rateLimit={{
-            limit: 10,
+            identifier: 'chat:default',
+            limit: 100,
             window: 3600,
-            redis: {
+            redis: new Redis({
               url: process.env.NEXT_PUBLIC_REDIS_URL!,
-              token: process.env.NEXT_PUBLIC_REDIS_TOKEN!
-            }
+              token: process.env.NEXT_PUBLIC_REDIS_TOKEN!,
+            }),
           }}
         >
-          <ChatWidget theme={theme} position="bottom-right" />
+          <ChatWidget position="bottom-right" />
         </RootProvider>
       </body>
     </html>
@@ -180,98 +137,50 @@ export default function RootLayout({
 }
 ```
 
-## Usage
+### 4. Environment Variables
 
-```typescript
-import { RootProvider, ChatWidget } from '@my-chatbot/ui'
+Add to your `.env.local`:
 
-// Your theme
-const theme = {
-  primary: {
-    background: '#0A0F1C',
-    text: '#FFFFFF',
+```env
+NEXT_PUBLIC_OPENAI_API_KEY=your_openai_key
+# Or for Gemini
+NEXT_PUBLIC_GEMINI_API_KEY=your_gemini_key
+
+NEXT_PUBLIC_REDIS_URL=your_redis_url
+NEXT_PUBLIC_REDIS_TOKEN=your_redis_token
+```
+
+### 5. Add Tailwind Config
+
+Make sure your `tailwind.config.ts` includes the UI package:
+
+```ts
+import type { Config } from 'tailwindcss'
+
+const config: Config = {
+  content: [
+    './app/**/*.{js,ts,jsx,tsx,mdx}',
+    './node_modules/@my-chatbot/ui/**/*.{js,ts,jsx,tsx}', // Add this line
+  ],
+  theme: {
+    extend: {},
   },
-  secondary: {
-    background: '#B08968',
-    text: '#0A0F1C',
-  },
-  accent: {
-    background: '#0EA5E9',
-    text: '#FFFFFF',
-  },
-  neutral: {
-    background: '#1E293B',
-    text: '#94A3B8',
-    border: '#334155',
-  }
+  plugins: [],
 }
 
-// Add to your app
-function App() {
-  return (
-    <RootProvider
-      personalContext={{
-        assistant: {
-          name: "Taiga", // Your AI assistant name
-        },
-        information: {
-          name: "Your Name",
-          email: "your@email.com",
-          // ... other details
-        },
-      }}
-      aiConfig={{
-        provider: 'openai',
-        apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
-        model: 'gpt-4-turbo-preview', // optional
-        temperature: 0.7 // optional
-      }}
-      rateLimit={{
-        limit: 10,
-        window: 3600,
-        redis: {
-          url: process.env.NEXT_PUBLIC_REDIS_URL,
-          token: process.env.NEXT_PUBLIC_REDIS_TOKEN
-        }
-      }}
-    >
-      <ChatWidget
-        theme={theme}
-        position="bottom-right"
-      />
-    </RootProvider>
-  )
-}
+export default config
+```
 
-// Using Gemini
-<RootProvider
-  personalContext={{
-    assistant: {
-      name: "Taiga", // Your AI assistant name
-    },
-    information: {
-      name: "Your Name",
-      email: "your@email.com",
-      // ... other details
-    },
-  }}
-  aiConfig={{
-    provider: 'gemini',
-    apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY,
-    model: 'gemini-pro', // optional
-    temperature: 0.7 // optional
-  }}
-  rateLimit={{
-    limit: 10,
-    window: 3600,
-    redis: {
-      url: process.env.NEXT_PUBLIC_REDIS_URL,
-      token: process.env.NEXT_PUBLIC_REDIS_TOKEN
-    }
-  }}
->
-  <ChatWidget />
-</RootProvider>
+## Troubleshooting
+
+If you encounter peer dependency issues (especially with Next.js < 15):
+
+```bash
+npm install --legacy-peer-deps
+# or
+yarn install --ignore-engines
+# or
+pnpm install --no-strict-peer-dependencies
 ```
 
 ## License
