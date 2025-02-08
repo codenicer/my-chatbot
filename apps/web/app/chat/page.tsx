@@ -41,7 +41,8 @@ export default function ChatPage() {
       },
     },
     preferences: {
-      minSalary: 100000,
+      minSalary: 95000,
+      maxSalary: 250000,
       location: 'Laguna',
       remoteWork: true,
     },

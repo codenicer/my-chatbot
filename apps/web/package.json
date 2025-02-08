@@ -12,7 +12,7 @@
   },
   "dependencies": {
    "@my-chatbot/core": "0.1.5", 
-    "@my-chatbot/ui": "workspace:*",
+    "@my-chatbot/ui": "1.0.1",
     "@types/nodemailer": "^6.4.14",
     "@upstash/redis": "^1.28.4",
     "google-auth-library": "^9.15.1",
