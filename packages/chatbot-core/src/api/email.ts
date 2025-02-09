@@ -23,15 +23,6 @@ export interface EmailRequest {
 }
 
 export function createEmailHandler(config: EmailConfig) {
-  console.log('core:createEmailHandler', {
-    host: config.configs.host,
-    port: config.configs.port,
-    secure: config.configs.port === 465,
-    auth: {
-      user: config.configs.user,
-      pass: config.configs.pass,
-    },
-  })
   const transporter = config.nodemailer.createTransport({
     host: config.configs.host,
     port: config.configs.port,
