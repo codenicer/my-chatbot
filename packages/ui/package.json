@@ -25,7 +25,7 @@
     "dev": "tsup src/index.ts --format esm,cjs --watch --dts"
   },
   "dependencies": {
-    "@my-chatbot/core": "workspace:^",
+    "@my-chatbot/core": "0.1.6",
     "@radix-ui/react-dialog": "^1.1.5",
     "@radix-ui/react-label": "^2.0.2",
     "@radix-ui/react-scroll-area": "^1.2.2",
