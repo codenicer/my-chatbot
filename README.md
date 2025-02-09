@@ -7,7 +7,9 @@ A customizable AI chat widget for Next.js portfolio websites. Built with TypeScr
 ## Published Packages
 
 - [@my-chatbot/ui](https://www.npmjs.com/package/@my-chatbot/ui)
+  [![NPM version](https://img.shields.io/npm/v/@my-chatbot/ui.svg)](https://www.npmjs.com/package/@my-chatbot/ui)
 - [@my-chatbot/core](https://www.npmjs.com/package/@my-chatbot/core)
+  [![NPM version](https://img.shields.io/npm/v/@my-chatbot/core.svg)](https://www.npmjs.com/package/@my-chatbot/core)
 
 ## Features
 
@@ -301,7 +303,5 @@ MIT © [Ruther Teñido](https://github.com/codenicer)
 
 - [Ruther Teñido](https://github.com/codenicer)
 - [Portfolio](https://codenicer.dev)
-  [![NPM version](https://img.shields.io/npm/v/@my-chatbot/ui.svg)](https://www.npmjs.com/package/@my-chatbot/ui)
-  [![NPM version](https://img.shields.io/npm/v/@my-chatbot/core.svg)](https://www.npmjs.com/package/@my-chatbot/core)
 
 If you use this project, please consider giving it a ⭐️
