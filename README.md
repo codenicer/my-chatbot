@@ -137,20 +137,125 @@ export default function RootLayout({
 }
 ```
 
-### 4. Environment Variables
+### 4. Add api roouters
+
+- `app/api/email/send-resume/route.ts`
+  Add to your `app/api/email/send-resume/route.ts`:
+
+```ts
+import { createEmailHandler } from '@my-chatbot/core'
+import { NextResponse } from 'next/server'
+import nodemailer from 'nodemailer'
+
+const handler = createEmailHandler({
+  nodemailer,
+  configs: {
+    host: process.env.SMTP_HOST!,
+    port: Number(process.env.SMTP_PORT),
+    user: process.env.SMTP_USER!,
+    pass: process.env.SMTP_PASS!,
+    from: process.env.SMTP_FROM!,
+  },
+})
+
+export async function POST(request: Request) {
+  try {
+    const body = await request.json()
+
+    const result = await handler.POST({ body })
+    return NextResponse.json(result.json, { status: result.status || 500 })
+  } catch (error) {
+    console.error('Email route error:', error)
+    return NextResponse.json({ error: 'Failed to send email' }, { status: 500 })
+  }
+}
+```
+
+- `app/api/client-ip/route.ts`
+
+```ts
+import { NextResponse } from 'next/server'
+import { headers } from 'next/headers'
+
+export async function GET() {
+  const headersList = await headers()
+
+  const forwarded = headersList.get('x-forwarded-for')
+  const realIp = headersList.get('x-real-ip')
+
+  const ip = realIp || forwarded?.split(',')[0] || '127.0.0.1'
+
+  return new NextResponse(JSON.stringify({ ip }), {
+    status: 200,
+    headers: {
+      'Content-Type': 'application/json',
+      'Cache-Control': 'no-store, no-cache, must-revalidate',
+    },
+  })
+}
+```
+
+- `app/api/calendar/route.ts` (coming soon [Google Calendar Integration - Under Development])
+
+```ts
+import { google } from 'googleapis'
+import { NextResponse } from 'next/server'
+import { CalendarHandler } from '@my-chatbot/core'
+
+const calendar = google.calendar('v3')
+
+const auth = new google.auth.JWT({
+  email: process.env.NEXT_PUBLIC_CALENDAR_EMAIL,
+  key: process.env.NEXT_PUBLIC_CALENDAR_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+  scopes: ['https://www.googleapis.com/auth/calendar'],
+})
+
+const calendarHandler = new CalendarHandler({ calendar, auth })
+
+export async function POST(request: Request) {
+  const body = await request.json()
+  const result = await calendarHandler.createEvent(body)
+
+  if (result.status === 200) {
+    return NextResponse.json(result.data)
+  }
+
+  return NextResponse.json({ error: result.error }, { status: result.status })
+}
+```
+
+### 5. Environment Variables
 
 Add to your `.env.local`:
 
 ```env
-NEXT_PUBLIC_OPENAI_API_KEY=your_openai_key
-# Or for Gemini
-NEXT_PUBLIC_GEMINI_API_KEY=your_gemini_key
+# Email
+EMAIL_USER=smtp_user
+EMAIL_PASSWORD=smtp_pass
 
-NEXT_PUBLIC_REDIS_URL=your_redis_url
-NEXT_PUBLIC_REDIS_TOKEN=your_redis_token
+# Email Configuration
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=465
+SMTP_USER=smtp_user
+SMTP_PASS=smtp_pass
+SMTP_FROM="Ruther's AI Assistant <smtp_user>"
+
+# OpenAI
+NEXT_PUBLIC_OPENAI_API_KEY=openai_api_key
+
+
+# Google Calendar (coming soon - under development)
+NEXT_PUBLIC_CALENDAR_EMAIL=calendar_email@example.com
+NEXT_PUBLIC_CALENDAR_PRIVATE_KEY="calendar_private_key"
+
+
+# Redis Configuration
+NEXT_PUBLIC_REDIS_URL=https://growing-cricket-123123.upstash.io
+NEXT_PUBLIC_REDIS_TOKEN=redis_token
+
 ```
 
-### 5. Add Tailwind Config
+### 6. Add Tailwind Config
 
 Make sure your `tailwind.config.ts` includes the UI package:
 

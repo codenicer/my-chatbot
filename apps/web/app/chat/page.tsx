@@ -49,7 +49,6 @@ export default function ChatPage() {
   }
 
   useEffect(() => {
-    // Fetch client IP on component mount
     fetch('/api/client-ip')
       .then((res) => res.json())
       .then((data) => setClientIp(data.ip))
@@ -67,7 +66,9 @@ export default function ChatPage() {
   if (
     !process.env.NEXT_PUBLIC_OPENAI_API_KEY ||
     !process.env.NEXT_PUBLIC_REDIS_URL ||
-    !process.env.NEXT_PUBLIC_REDIS_TOKEN
+    !process.env.NEXT_PUBLIC_REDIS_TOKEN ||
+    !clientIp ||
+    clientIp === 'unknown'
   ) {
     return (
       <div className="p-4">

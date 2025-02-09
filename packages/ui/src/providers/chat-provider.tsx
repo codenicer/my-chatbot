@@ -72,8 +72,6 @@ export function ChatProvider({
     }))
   }
 
-  console.log('meetingContext', meetingContext)
-
   const handleMessage = React.useCallback(
     async (message: string) => {
       if (message.includes('SHOW_MEETING_FORM')) {
@@ -215,7 +213,7 @@ export function ChatProvider({
         // Check rate limit before processing message
         try {
           await checkRateLimit({
-            identifier: 'chat',
+            identifier: rateLimit.identifier,
             limit: rateLimit.limit,
             window: rateLimit.window,
             redis: rateLimit.redis,

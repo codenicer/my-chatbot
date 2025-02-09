@@ -17,9 +17,7 @@ export async function POST(request: Request) {
   try {
     const body = await request.json()
 
-    console.log('body', body)
     const result = await handler.POST({ body })
-    console.log('email result', result)
     return NextResponse.json(result.json, { status: result.status || 500 })
   } catch (error) {
     console.error('Email route error:', error)
