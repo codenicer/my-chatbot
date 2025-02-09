@@ -179,8 +179,8 @@ importers:
   packages/ui:
     dependencies:
       '@my-chatbot/core':
-        specifier: 0.1.6
-        version: 0.1.6(jiti@2.4.2)(next@15.1.6(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(postcss@8.5.1)(typescript@5.7.3)(yaml@2.7.0)
+        specifier: 0.1.7
+        version: 0.1.7(jiti@2.4.2)(next@15.1.6(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(postcss@8.5.1)(typescript@5.7.3)(yaml@2.7.0)
       '@radix-ui/react-dialog':
         specifier: ^1.1.5
         version: 1.1.5(@types/react-dom@18.3.5(@types/react@18.3.18))(@types/react@18.3.18)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
@@ -673,8 +673,8 @@ packages:
   '@manypkg/get-packages@1.1.3':
     resolution: {integrity: sha512-fo+QhuU3qE/2TQMQmbVMqaQ6EWbMhi4ABWP+O4AM1NqPBuy0OrApV5LO6BrrgnhtAHS2NH6RrVk9OL181tTi8A==}
 
-  '@my-chatbot/core@0.1.6':
-    resolution: {integrity: sha512-5NWGT6ZJGU71buqyDAUQl2nMH5GNMudX0qay1HcpIyix8Jj+WtbxnYTJbqwOCgTTT2o52CPCCUiwm3Gim/uV5w==}
+  '@my-chatbot/core@0.1.7':
+    resolution: {integrity: sha512-2szUpiFt8OggCJkx4QRcYNcqx12hWeEytnfRPXZzr7DoN28/N9sF5ebeZXaxJRnMhHcWLSOAa+EwM+aXyEOG4Q==}
     peerDependencies:
       next: ^14.0.0
 
@@ -3690,7 +3690,7 @@ snapshots:
       globby: 11.1.0
       read-yaml-file: 1.1.0
 
-  '@my-chatbot/core@0.1.6(jiti@2.4.2)(next@15.1.6(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(postcss@8.5.1)(typescript@5.7.3)(yaml@2.7.0)':
+  '@my-chatbot/core@0.1.7(jiti@2.4.2)(next@15.1.6(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(postcss@8.5.1)(typescript@5.7.3)(yaml@2.7.0)':
     dependencies:
       '@google/generative-ai': 0.21.0
       '@types/node': 20.17.16
